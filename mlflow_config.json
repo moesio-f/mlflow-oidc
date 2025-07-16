@@ -1,0 +1,5 @@
+{
+    "MLFLOW_REMOTE_TRACKING_URL": "http://localhost:8000/",
+    "PROVIDER_WK_URL": "http://localhost:8083/realms/mlflow/.well-known/openid-configuration/",
+    "CLIENT_ID": "desktop-oidc-client"
+}

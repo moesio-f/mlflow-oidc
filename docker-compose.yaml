@@ -1,0 +1,84 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./config/pg-init.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-p 5432"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+      start_interval: 1s
+    shm_size: 128mb
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=rootroot
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+
+  initialize-minio:
+    image: minio/mc:latest
+    entrypoint: sh -c "sleep 5; mc alias set dm http://minio:9000 root rootroot; mc mb dm/mlflow"
+    depends_on:
+      minio: 
+        condition: service_started
+
+  keycloak:
+    build: 
+      context: keycloak
+      target: app
+      args:
+        - KC_DB=postgres
+    ports:
+      - "8083:8080"
+      - "8443:8443"
+    environment:
+      - KC_DB=postgres
+      - KC_DB_USERNAME=root
+      - KC_DB_PASSWORD=root
+      - KC_DB_URL=jdbc:postgresql://db/keycloak
+      - KC_HOSTNAME=http://localhost:8083
+      - KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: start --optimized --import-realm --http-enabled true
+    depends_on:
+      db:
+        condition: service_healthy
+
+  mlflow:
+    build: mlflow-server
+    environment:
+      - MLFLOW_ARTIFACT_STORAGE=s3://minio:9000/mlflow
+      - MLFLOW_DB=postgresql+psycopg2://root:root@db/mlflow
+      - MLFLOW_PORT=8080
+    depends_on:
+      db:
+        condition: service_healthy
+      initialize-minio:
+        condition: service_completed_successfully
+
+  nginx:
+    build: nginx
+    environment:
+      - MLFLOW_TRACKING_SERVER_URL=http://mlflow:8080
+      - KEYCLOAK_UMA_URL=http://keycloak:8080/realms/mlflow/protocol/openid-connect/token 
+      - OIDC_CLIENT_ID=nginx-mlflow-resource-server
+      - OIDC_CLIENT_SECRET=qf9InLUQacHiBgSqHG4epBAVJLl4IGhN
+    ports:
+      - "8000:80"
+    depends_on:
+      keycloak:
+        condition: service_started
+      mlflow:
+        condition: service_started

@@ -1,0 +1,10 @@
+# MLFlow
+mlflow[auth]>=3.0.0
+fastapi>=0.116.0
+pydantic_settings>=2.10.0
+pydantic>=2.11.0
+
+# OIDC Client
+requests>=2.32.0
+pydantic_settings>=2.10.0
+pydantic>=2.11.0

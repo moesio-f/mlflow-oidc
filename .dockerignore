@@ -1,0 +1,15 @@
+# This is a whitelist.
+*
+
+# Keycloack
+./keycloak/Dockerfile
+./keycloak/realms/*.json
+
+# NGINX
+./nginx/Dockerfile
+./nginx/data/nginx.conf
+./nginx/scripts/*.js
+
+# MLFlow
+./mlflow-server/Dockerfile
+./mlflow-server/scritps/run.sh
