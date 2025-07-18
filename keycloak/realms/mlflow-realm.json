@@ -848,20 +848,8 @@
         "policyEnforcementMode": "ENFORCING",
         "resources": [
           {
-            "name": "mlflow-rest-delete-api",
-            "type": "mlflow:delete",
-            "ownerManagedAccess": false,
-            "displayName": "MLFlow REST Delete API",
-            "attributes": {},
-            "uris": [
-              "*/delete-tag",
-              "*/delete"
-            ],
-            "icon_uri": ""
-          },
-          {
-            "name": "mlflow-all-api",
-            "type": "mlflow:all",
+            "name": "mlflow-full-api",
+            "type": "mlflow:full",
             "ownerManagedAccess": false,
             "displayName": "MLFlow Full REST API",
             "attributes": {},
@@ -869,52 +857,89 @@
               "/*"
             ],
             "icon_uri": ""
+          },
+          {
+            "name": "mlflow-delete-api",
+            "type": "mlflow:delete",
+            "ownerManagedAccess": false,
+            "displayName": "MLFlow Delete REST API",
+            "attributes": {},
+            "uris": [
+              "/ajax-api/2.0/mlflow/runs/delete-tag",
+              "/2.0/mlflow/registered-models/alias",
+              "/2.0/mlflow/runs/delete",
+              "/2.0/mlflow/runs/delete-tag",
+              "/ajax-api/2.0/mlflow/registered-models/alias",
+              "/2.0/mlflow/registered-models/delete",
+              "/ajax-api/2.0/mlflow/model-versions/delete",
+              "/2.0/mlflow/model-versions/delete-tag",
+              "/ajax-api/2.0/mlflow/experiments/delete",
+              "/ajax-api/2.0/mlflow/registered-models/delete",
+              "/2.0/mlflow/registered-models/delete-tag",
+              "/ajax-api/2.0/mlflow/model-versions/delete-tag",
+              "/ajax-api/2.0/mlflow/runs/delete",
+              "/ajax-api/2.0/mlflow/registered-models/delete-tag",
+              "/2.0/mlflow/experiments/delete",
+              "/2.0/mlflow/model-versions/delete"
+            ],
+            "icon_uri": ""
           }
         ],
         "policies": [
           {
-            "name": "Admin Policy",
-            "description": "Admin policy.",
-            "type": "role",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "roles": "[{\"id\":\"nginx-mlflow-resource-server/Admin\",\"required\":false}]"
-            }
-          },
-          {
-            "name": "Default Policy",
-            "description": "Policy for a default user.",
+            "name": "admin-allowed",
+            "description": "Admin allowance policy.",
             "type": "role",
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
             "config": {
               "fetchRoles": "false",
-              "roles": "[{\"id\":\"nginx-mlflow-resource-server/Default\",\"required\":false},{\"id\":\"nginx-mlflow-resource-server/Admin\",\"required\":false}]"
+              "roles": "[{\"id\":\"nginx-mlflow-resource-server/Admin\",\"required\":false}]"
             }
           },
           {
-            "name": "Deletion API",
-            "description": "Only Admins should be allowed to the deletion API.",
+            "name": "default-allowed",
+            "description": "Default allowance policy user.",
+            "type": "role",
+            "logic": "POSITIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "fetchRoles": "false",
+              "roles": "[{\"id\":\"nginx-mlflow-resource-server/Default\",\"required\":false}]"
+            }
+          },
+          {
+            "name": "default-deny",
+            "description": "Default deny policy.",
+            "type": "role",
+            "logic": "NEGATIVE",
+            "decisionStrategy": "UNANIMOUS",
+            "config": {
+              "fetchRoles": "false",
+              "roles": "[{\"id\":\"nginx-mlflow-resource-server/Default\",\"required\":false}]"
+            }
+          },
+          {
+            "name": "everyone-allowed-to-full",
+            "description": "Everyone is allowed to use the full API (restrictions apply on specific resources).",
+            "type": "resource",
+            "logic": "POSITIVE",
+            "decisionStrategy": "AFFIRMATIVE",
+            "config": {
+              "defaultResourceType": "",
+              "resources": "[\"mlflow-full-api\"]",
+              "applyPolicies": "[\"admin-allowed\",\"default-allowed\"]"
+            }
+          },
+          {
+            "name": "default-denied-to-delete",
+            "description": "Default users aren't allowed to delete methods.",
             "type": "resource",
             "logic": "POSITIVE",
             "decisionStrategy": "UNANIMOUS",
             "config": {
-              "defaultResourceType": "",
-              "resources": "[\"mlflow-rest-delete-api\"]",
-              "applyPolicies": "[\"Admin Policy\"]"
-            }
-          },
-          {
-            "name": "MLFlow API",
-            "description": "Access to the whole MLFlow API.",
-            "type": "resource",
-            "logic": "POSITIVE",
-            "decisionStrategy": "UNANIMOUS",
-            "config": {
-              "defaultResourceType": "",
-              "resources": "[\"mlflow-rest-delete-api\",\"mlflow-all-api\"]",
-              "applyPolicies": "[\"Default Policy\"]"
+              "resources": "[\"mlflow-delete-api\"]",
+              "applyPolicies": "[\"default-deny\"]"
             }
           }
         ],
@@ -1803,14 +1828,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
-            "oidc-address-mapper",
             "saml-user-attribute-mapper",
+            "saml-role-list-mapper",
             "oidc-usermodel-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
             "oidc-usermodel-attribute-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper"
+            "oidc-full-name-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper"
           ]
         }
       },
@@ -1854,14 +1879,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
+            "saml-role-list-mapper",
+            "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
             "oidc-address-mapper",
             "oidc-usermodel-attribute-mapper",
             "oidc-full-name-mapper",
-            "saml-user-property-mapper",
-            "saml-role-list-mapper",
-            "oidc-usermodel-property-mapper",
-            "saml-user-attribute-mapper"
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-property-mapper"
           ]
         }
       }

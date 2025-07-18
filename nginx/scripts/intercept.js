@@ -42,7 +42,7 @@ async function is_allowed(r) {
       grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
       audience: CLIENT_ID,
       permission_resource_format: "uri",
-      permission_resource_matching_uri: "True",
+      permission_resource_matching_uri: true,
       response_mode: "decision",
       permission: r.uri,
     }),
