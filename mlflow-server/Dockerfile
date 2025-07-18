@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir "mlflow[auth]>=3.0.0" "psycopg2-binary>=2.9.10"
+    pip install --no-cache-dir "mlflow[auth]>=3.0.0" "psycopg2-binary>=2.9.10" "boto3>=1.39.0"
 
 COPY ./scripts /scripts
 

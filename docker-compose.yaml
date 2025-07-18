@@ -59,7 +59,10 @@ services:
   mlflow:
     build: mlflow-server
     environment:
-      - MLFLOW_ARTIFACT_STORAGE=s3://minio:9000/mlflow
+      - MLFLOW_ARTIFACT_STORAGE=s3://mlflow/
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=root
+      - AWS_SECRET_ACCESS_KEY=rootroot
       - MLFLOW_DB=postgresql+psycopg2://root:root@db/mlflow
       - MLFLOW_PORT=8080
     depends_on:
