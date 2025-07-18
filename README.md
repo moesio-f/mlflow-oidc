@@ -15,25 +15,25 @@ When a MLFlow Tracking server must be exposed through the internet, security mea
 
 ### 1. Setting Up the Infrastructure
 
-1.1 The first step is to start all the servers running `docker-compose up`;
-1.2 Once everything is up and running, you should be able to access the following services:
+1. The first step is to start all the servers running `docker-compose up`;
+2. Once everything is up and running, you should be able to access the following services:
     - MinIO at http://localhost:9001 (user: `root`, password: `rootroot`);
     - Keycloak at http://localhost:8083 (user: `admin`, password: `admin`);
-    - NGINX proxy to MLFlow tracking server at http://localhost:8000 (the browser should indicate a 400 Bad Request error);
-1.3 The next step is to define a sample user in [Keycloak](https://www.keycloak.org/docs/latest/server_admin/index.html#assembly-managing-users_server_administration_guide): the user should be on the realm `mlflow` and must have a role mapping for either `Default` or `Admin`;
+    - NGINX proxy to MLFlow tracking server at http://localhost:8000 (the browser should indicate a 400 Bad Request error);  
+3. The next step is to define a sample user in [Keycloak](https://www.keycloak.org/docs/latest/server_admin/index.html#assembly-managing-users_server_administration_guide): the user should be on the realm `mlflow` and must have a role mapping for either `Default` or `Admin`;
     - The `mlflow` realm comes pre-configured with roles, permissions and resources, you might want to take a deeper look into the realm configuration;
 
 ### 2. Running Locally
 
-2.1 Once you have at least a user defined in the `mlflow` realm on Keycloak, you should be able to access the MLFlow tracking server UI and run experiments;
-2.2 Start by installing the requirements with your preferred manager (e.g., `uv pip install -r requirements.txt`);
+1. Once you have at least a user defined in the `mlflow` realm on Keycloak, you should be able to access the MLFlow tracking server UI and run experiments;
+2. Start by installing the requirements with your preferred manager (e.g., `uv pip install -r requirements.txt`);
     - It is advisable to create a [virtual environment](https://docs.python.org/3/library/venv.html) instead of installing packages system-wide;
-2.3 Once everything is installed, access the MLFlow interface by running `python -m mlflow_app.ui`;
+3. Once everything is installed, access the MLFlow interface by running `python -m mlflow_app.ui`;
     - You will be prompted to enter you username and password defined on Keycloak;
     - The interface will be available in http://localhost:5000;
     - The [mlflow_app.ui](./mlflow_app/ui.py) creates a simple local proxy using `FastAPI` which takes care of sending your user credentials to NGINX;
     - The OIDC client has created a `credentials.json` file which contains your tokens. This information is sensitive and should be stored carefully;
-2.4 Now that you can access the MLFlow UI using a secure token, you can run a sample experiment with `python -m mlflow_app.sample`;
+4. Now that you can access the MLFlow UI using a secure token, you can run a sample experiment with `python -m mlflow_app.sample`;
     - The code should run quite fast;
     - You should note that the sample uses the [`auto_refresh.TokenAutoRefresh`](./mlflow_app/auto_refresh.py) context manager, which takes care of updating the OIDC tokens alongside the run (otherwise run duration would be limited to the access token lifetime);
 
