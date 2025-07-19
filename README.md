@@ -33,7 +33,7 @@ When a MLFlow Tracking server must be exposed through the internet, security mea
 3. Once everything is installed, access the MLFlow interface by running `python -m mlflow_app.ui`;
     - You will be prompted to enter you username and password defined on Keycloak;
     - The interface will be available at http://localhost:5000;
-    - The [mlflow_app.ui](./mlflow_app/ui.py) creates a simple local proxy using `FastAPI` which takes care of sending your user credentials to NGINX;
+    - The [mlflow_app.ui](./mlflow_app/ui.py) creates a simple local proxy using `FastAPI` which takes care of sending your user credentials (i.e., access token) to NGINX;
     - The OIDC client has created a `credentials.json` file which contains your tokens. This information is sensitive and should be stored carefully;
 4. Now that you can access the MLFlow UI using a secure token, you can run a sample experiment with `python -m mlflow_app.sample`;
     - The code should run quite fast;
