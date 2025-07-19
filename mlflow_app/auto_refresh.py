@@ -12,9 +12,9 @@ from .config import OIDC_CLIENT as client
 # Multiplier that defines how much
 #   of the remaining lifetime of
 #   the access token should the thread
-#   sleep prior to refreshing it.
-# Smaller values make the thread try
-#   to refresh the tokens more times.
+#   sleep prior to refreshing it again.
+# Smaller values make the thread refresh
+#   the token more frequently.
 _WAIT_MULTIPLIER = 1 / 250
 
 
@@ -32,6 +32,10 @@ class TokenAutoRefresh:
 
     def __enter__(self):
         assert self._thread is None and not self._stop
+        # Guarantee that the environment variable is set
+        self._base_refresh()
+
+        # Schedule threads to periodic update tokens
         self._thread = threading.Thread(target=self._refresh_mlflow_token)
         self._thread.start()
         return self
