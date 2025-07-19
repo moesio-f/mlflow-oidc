@@ -101,7 +101,7 @@ flowchart TD
     - [`Request Intercept`](./nginx/scripts/intercept.js): module that provides the "identity-aware" capability (i.e., checks with the Identity Provider whether the user is valid and has sufficient permission to the resource);
 - [`MLFlow Tracking Server`](./mlflow-server): remote tracking server;
 - `Object Storage`: remote object storage for models, artifacts, etc;
-- `Relational Database`: database for MLFlow and Keycloak data (e.g., experiments, run, metadata);
+- `Relational Database`: database for MLFlow (e.g., experiments, run, metadata) and Keycloak (e.g., realms, users, tokens);
 
 ## Alternatives
 
