@@ -1,6 +1,5 @@
 """MLFlow using OIDC."""
 
-import asyncio
 import threading
 import time
 import webbrowser
@@ -36,7 +35,7 @@ def run(port: int = 5000):
     @app.put("/{fp:path}")
     @app.patch("/{fp:path}")
     @app.delete("/{fp:path}")
-    def proxied_response(fp, request: Request):
+    async def proxied_response(fp, request: Request):
         # Get actual response from remote URL
         response = requests.request(
             method=request.method,
@@ -47,7 +46,7 @@ def run(port: int = 5000):
                 "Authorization": f"Bearer {client.user.access_token.encoded}",
                 **request.headers,
             },
-            data=asyncio.run(request.body()),
+            data=await request.body(),
             cookies=request.cookies,
             allow_redirects=False,
         )
