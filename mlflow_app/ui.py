@@ -1,6 +1,9 @@
 """MLFlow using OIDC."""
 
 import asyncio
+import threading
+import time
+import webbrowser
 
 import click
 import requests
@@ -54,11 +57,23 @@ def run(port: int = 5000):
             response.headers,
         )
 
+    # Open tab after a small delay (should be up)
+    threading.Thread(target=lambda: _open_tab_after(f"http://localhost:{port}")).start()
     uvicorn.run(
         app,
         host="0.0.0.0",
         port=port,
     )
+
+
+def _open_tab_after(url: str, seconds: float = 0.5):
+    """Open a new tab after some seconds.
+
+    :param url: url to open in new tab.
+    :param seconds: seconds to wait before opening.
+    """
+    time.sleep(seconds)
+    webbrowser.open_new_tab(url)
 
 
 if __name__ == "__main__":
