@@ -55,7 +55,7 @@ The following non-exhaustive list contains some considerations beyond the templa
 4. To access the MLFlow UI in this architecture each end-user is required to run a local proxy which sets the appropriate authorization headers;
     - This might be a hardship to setup, and debug across platforms;
 5. MLFlow doesn't have a built-in notion of user;
-    - MLFlow has a `User` tag reads the current user from the system;
+    - MLFlow has a `User` tag that reads the current user from the system;
     - If the OIDC user is also important to be logged, the [`mlflow_app.utils.set_oidc_user`](./mlflow_app/utils.py) should be called on the beginning of each run (see the samples);
     - In any case, this only logs the user for the run and can be easily changed;
     - It is more robust that either NGINX or Keycloak log user actions (e.g., endpoint calls, authorization requests);
